@@ -10,7 +10,6 @@ const asyncHandler = (requestHandler) => {
 export {asyncHandler}
 
 
-
 // Higher order function
 const asyncHandlerWithTryCatch = (fn) => async (req, res, next) => {
     try {
