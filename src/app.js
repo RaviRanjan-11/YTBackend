@@ -14,7 +14,7 @@ app.use(cors({
 }))
 
 app.use(express.json({
-    // max limit for requesr
+    // max limit for request
     limit: "16kb"
 }))
 
@@ -22,8 +22,6 @@ app.use(express.urlencoded({
     extended: true,
     limit: "16kb"
 }))
-
-app.use(express.static())
 
 app.use(cookieParser())
 
