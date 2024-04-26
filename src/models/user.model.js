@@ -62,18 +62,37 @@ userSchema.pre("save", async function (next){
     next()
 })
 
-
 userSchema.methods.isPasswordCorrect = async function (password) {
     return await bcrypt.compare(password, this.password)
 }
 
 
-userSchema.methods.generatejwttoken = async function (){
+// it can be without async as it is fast already
+userSchema.methods.generateAccesstoken =  function (){
 
+    return jwttoken.sign({
+        _id:String,
+        email: this.email,
+        userName:this.userName,
+        fullName: this.fullName
+    },
+    process.env.ACCESS_TOKEN_SECRET,
+    {
+        expiresIn:process.env.ACCESS_TOKEN_EXPIRY
+    }
+)
 }
 
-userSchema.methods.generateRefreshToken = function() {
-    
+// it can be without async as it is fast already
+userSchema.methods.generateRefreshToken = async function() {
+    return jwttoken.sign({
+        _id:String,
+    },
+    process.env.REFRESH_TOKEN_SECRET,
+    {
+        expiresIn:process.env.REFRESH_TOKEN_EXPIRY
+    }
+)
 }
 
 
