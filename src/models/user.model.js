@@ -67,4 +67,14 @@ userSchema.methods.isPasswordCorrect = async function (password) {
     return await bcrypt.compare(password, this.password)
 }
 
+
+userSchema.methods.generatejwttoken = async function (){
+
+}
+
+userSchema.methods.generateRefreshToken = function() {
+    
+}
+
+
 export const User = mongoose.model("User", userSchema)
