@@ -5,7 +5,7 @@ import bcrypt from 'bcrypt'
 
 const UserSchema = new mongoose.Schema({
 
-    userName: {
+    user_name: {
         type: String,
         required: true,  
         unique: [true, "User name is already taken"],
@@ -22,7 +22,7 @@ const UserSchema = new mongoose.Schema({
         trim: true,
     },
 
-    fullName : {
+    full_name : {
         type: String,
         required: true,
         trim: true,
@@ -31,14 +31,13 @@ const UserSchema = new mongoose.Schema({
 
     avatar: {                
         type: String, //cloudanary service like aws we can also use AWS here
-        required: true,
     },
 
     coverImage: {
         type: String, //cloudanary service like aws we can also use AWS here
     },
 
-    watchHistory :[
+    watch_history :[
         {
         type: Schema.Types.ObjectId,
             ref: "Video"
@@ -50,7 +49,7 @@ const UserSchema = new mongoose.Schema({
         required: [true, "Password is required"]
     },
 
-    refreshToken :{
+    refresh_token :{
         type: String
     }
 }, 
@@ -73,8 +72,8 @@ UserSchema.methods.generateAccesstoken =  function (){
     return jwttoken.sign({
         _id:String,
         email: this.email,
-        userName:this.userName,
-        fullName: this.fullName
+        user_name:this.user_name,
+        full_name: this.full_name
     },
     process.env.ACCESS_TOKEN_SECRET,
     {
