@@ -1,8 +1,9 @@
 import mongoose from "mongoose";
-import  jwttoken  from 'jsonwebtoken'
-import  bcrypt  from 'bcrypt'
+import { Schema } from "mongoose";
+import jwttoken from 'jsonwebtoken'
+import bcrypt from 'bcrypt'
 
-const userSchema = new Schema({
+const UserSchema = new mongoose.Schema({
 
     userName: {
         type: String,
@@ -55,20 +56,19 @@ const userSchema = new Schema({
 }, 
 {timestamps:true})
     
-userSchema.pre("save", async function (next){
+UserSchema.pre("save", async function (next){
     if(!this.isModified(this.password)) return next()
 
-    this.password = bcrypt.hash(this.password,10)
+    this.password = await bcrypt.hash(this.password,10)
     next()
 })
 
-userSchema.methods.isPasswordCorrect = async function (password) {
+UserSchema.methods.isPasswordCorrect = async function (password) {
     return await bcrypt.compare(password, this.password)
 }
 
-
 // it can be without async as it is fast already
-userSchema.methods.generateAccesstoken =  function (){
+UserSchema.methods.generateAccesstoken =  function (){
 
     return jwttoken.sign({
         _id:String,
@@ -84,7 +84,7 @@ userSchema.methods.generateAccesstoken =  function (){
 }
 
 // it can be without async as it is fast already
-userSchema.methods.generateRefreshToken = async function() {
+UserSchema.methods.generateRefreshToken = async function() {
     return jwttoken.sign({
         _id:String,
     },
@@ -95,5 +95,4 @@ userSchema.methods.generateRefreshToken = async function() {
 )
 }
 
-
-export const User = mongoose.model("User", userSchema)
+export const User = mongoose.model("User", UserSchema)
