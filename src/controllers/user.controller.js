@@ -8,6 +8,20 @@ import {uploadOnCloudinary} from "../utils/Cloudnary.js"
 
 import { APIResponse } from "../utils/APIResponse.js";
 
+const generateAccesstokenAndRefreshToken = async (userid) => {
+    try {
+     const user = await User.findById(userid)
+     const refreshtoken = user.generateAccesstoken()
+     const accessToken = user.generateRefreshToken()
+     user.accessToken = accessToken
+     user.refreshToken = refreshtoken
+     await user.save({validateBeforeSave: false})
+
+    } catch (error) {
+        throw new APIError(500, "Something went wrong while generating token")
+    }
+}
+
 const registerUser = asyncHandler(async (req, res) => {
    // get user detail from client
    // Validation of request data
@@ -63,4 +77,58 @@ const registerUser = asyncHandler(async (req, res) => {
 
 })
 
-export {registerUser}
+const loginUser = asyncHandler(async (req, res) => {
+
+    // get data from body
+    // user name or email
+    // find the user
+    // match the password
+    // crete access token and refresh token
+    // send cookie
+
+    const {email, username, password} = req.body
+
+    if(!username || !email){
+        throw APIError(400,"Please enter a valid email or username")
+    }
+    const user = User.findOne({
+        $or:[{username, email}]
+    })
+    if(!user){
+        throw APIError(400, "User not found")
+    }
+
+    const isPasswordValid = await user.isPasswordCorrect(password)
+
+    if(!isPasswordValid){
+        throw APIError(401, "Invaild user credintials")
+    }
+    
+    const {refreshToken, accessToken} = await generateAccesstokenAndRefreshToken(user._id)
+    const loggedInUser = await User.findById(user._id).select (-password -refreshToken)
+
+    const option = {
+        httpOnly:true,
+        secure: true
+    }
+    return res
+    .status(200)
+    .cookie('accessToken',accessToken, option)
+    .cookie('refreshToken',refreshToken, option)
+    .json(
+        new APIResponse(
+            200,
+            {user:loggedInUser, accessToken, refreshToken},
+            "User logged in succesfully"
+        )
+    )
+
+})
+
+const logutUser =  asyncHandler(async() => {
+
+    // clear cookies
+    // 
+})
+
+export {registerUser, loginUser, }
